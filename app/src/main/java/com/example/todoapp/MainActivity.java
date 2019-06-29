@@ -38,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         readItem();
-        itemAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1,items);
+        itemAdapter = new ArrayAdapter<String>(this, R.layout.list_item_layout,items);
         lvItems = findViewById(R.id.lvItems);
         lvItems.setAdapter(itemAdapter);
 
