@@ -1,7 +1,11 @@
 package com.example.todoapp;
 
+import android.content.Intent;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -19,16 +23,20 @@ import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
+    //a numeric code to identify the edit activity
+    public final static int EDIT_REQUEST_CODE = 20;
+    //keys used for passing data between activities
+    public final static String ITEM_TEXT = "itemText";
+    public final static String ITEM_POSITION = "itemPosition";
+
     ArrayList<String>items;
     ArrayAdapter<String>itemAdapter;
     ListView lvItems;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         readItem();
         itemAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1,items);
         lvItems = findViewById(R.id.lvItems);
@@ -61,6 +69,29 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        lvItems.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Intent i = new Intent(MainActivity.this, EditItemActivity.class);
+                i.putExtra(ITEM_TEXT, items.get(position));
+                i.putExtra(ITEM_POSITION,position);
+                startActivityForResult(i,EDIT_REQUEST_CODE);
+            }
+        });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if(resultCode == RESULT_OK && requestCode == EDIT_REQUEST_CODE){
+            String updatedItem = data.getExtras().getString(ITEM_TEXT);
+            int position = data.getExtras().getInt(ITEM_POSITION);
+            items.set(position,updatedItem);
+            itemAdapter.notifyDataSetChanged();
+            writeItems();
+            Toast.makeText(this, "Item updated successfully", Toast.LENGTH_SHORT).show();
+        }
     }
 
     private File getDataFile(){
